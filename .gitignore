@@ -1,0 +1,104 @@
+# .gitignore for usn-watcher
+
+# Build outputs
+/bin/
+/obj/
+/**/bin/
+/**/obj/
+
+# Publish output
+/dist/
+/**/dist/
+
+# Visual Studio / Rider
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+.idea/
+*.iml
+
+# Rider caches
+.idea/
+*.sublime-workspace
+
+# VS Code
+.vscode/
+.history/
+
+# NuGet packages
+*.nupkg
+packages/
+.nuget/
+project.lock.json
+project.fragment.lock.json
+*.nupkg
+
+# Dotnet publish single-file/runtime artifacts
+*.exe
+*.dll
+*.deps.json
+*.runtimeconfig.json
+*.runtimeconfig.dev.json
+
+# Logs, temporary files
+*.log
+*.tmp
+*.temp
+*.cache
+temp/
+
+# Test results
+TestResults/
+coverage/
+*.coverage
+nunit-*.xml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# User secrets / environment
+.env
+.env.local
+local.settings.json
+secrets.json
+appsettings.Development.json
+*.pfx
+*.p12
+
+# Editor/IDE specific
+*.sublime-project
+*.sublime-workspace
+*.vscode/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Generated files
+/*.user
+/*.userosscache
+
+# Logs created by the service or scripts
+%ProgramData%/usn-watcher/
+%APPDATA%/usn-watcher/
+
+# Ignore published single-file for local dev builds that may be created during CI/publish
+tools/**/publish/
+
+# Ignore node modules if any examples use node
+node_modules/
+
+# Ignore Python virtualenvs
+venv/
+.env/
+
+# Ignore coverage and profiling
+coverage/
+*.prof
+
+# Keep this file tracked
+!.gitignore

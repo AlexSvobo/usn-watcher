@@ -1,0 +1,78 @@
+name: Build and Release
+
+permissions:
+  contents: write
+  packages: write
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Tag or branch to build (e.g. v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # when manually dispatched we want to allow specifying a ref (tag or branch)
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.ref || github.ref }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore src/UsnWatcher.Host/UsnWatcher.Host.csproj
+
+      - name: Publish single-file exe
+        run: |
+          dotnet publish src/UsnWatcher.Host/UsnWatcher.Host.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o dist
+
+      - name: Show dist contents (debug)
+        shell: powershell
+        run: |
+          if (-Not (Test-Path dist)) { Write-Error 'dist directory not found'; exit 1 }
+          Write-Host 'dist directory listing:'
+          Get-ChildItem -Path dist -Recurse | ForEach-Object { Write-Host $_.FullName }
+
+      - name: Zip artifacts (reliable)
+        shell: powershell
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $zip = Join-Path -Path (Get-Location) -ChildPath "dist/usn-watcher-$tag-win-x64.zip"
+          $files = Get-ChildItem -Path dist -Recurse -File | ForEach-Object { $_.FullName }
+          if (-not $files) { Write-Error 'no files found in dist to archive'; exit 1 }
+          Compress-Archive -Path $files -DestinationPath $zip -Force
+
+      - name: Compute checksums
+        shell: powershell
+        run: |
+          Set-Location dist
+          $out = "SHA256SUMS.txt"
+          Remove-Item $out -ErrorAction SilentlyContinue
+          Get-ChildItem -File | ForEach-Object {
+            $h = (Get-FileHash -Algorithm SHA256 $_.FullName).Hash
+            "$h  $($_.Name)" | Out-File -Encoding utf8 -Append $out
+          }
+
+      - name: Create GitHub Release and upload assets
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.ref || github.ref_name }}
+          name: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.ref || github.ref_name }}
+          files: |
+            dist/usn-watcher-${{ github.ref_name }}-win-x64.zip
+            dist/usn-watcher.exe
+            dist/*.pdb
+            dist/SHA256SUMS.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
