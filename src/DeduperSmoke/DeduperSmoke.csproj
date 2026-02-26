@@ -6,11 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="UsnWatcher.Core">
-      <HintPath>..\UsnWatcher.Core\bin\Debug\net8.0-windows\UsnWatcher.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="UsnWatcher.Host">
-      <HintPath>..\UsnWatcher.Host\bin\Debug\net8.0-windows\usn-watcher.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\UsnWatcher.Core\UsnWatcher.Core.csproj" />
+    <ProjectReference Include="..\UsnWatcher.Host\UsnWatcher.Host.csproj" />
   </ItemGroup>
 </Project>

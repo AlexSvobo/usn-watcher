@@ -63,6 +63,10 @@ dotnet run -- C --format json --filter "ext:.cs AND reason:CLOSE"
 ```powershell
 dotnet run -- C --format json --filter "NOT path:node_modules AND ext:.log AND reason:DATA_EXTEND"
 ```
+To run the dashboard
+dotnet run --project tools/ws-bridge/ws-bridge.csproj
+then open usn-dashboard.html or navigate to localhost:3000
+**This will not (currently) run the MFT scan and path cache, and instead depends on you having ran the Host prior. 
 
 Notes & Troubleshooting
 - Elevated privileges: reading the USN Journal requires Administrator rights. If you see "Access Denied", run your terminal as Administrator.
